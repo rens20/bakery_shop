@@ -13,9 +13,10 @@ function ValidateLogin($email, $password) {
     $email = mysqli_real_escape_string($conn, $email); // Escape input for security
     $password = mysqli_real_escape_string($conn, $password);
     $sql = "SELECT * FROM user WHERE email = '$email' && password = '$password'";
+    echo "SQL Query: $sql<br>"; // Debugging output
     $result = $conn->query($sql);
     $row = mysqli_fetch_assoc($result);
-
+    var_dump($row); // Debugging output
     return $row;
 }
 
