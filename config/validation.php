@@ -8,11 +8,13 @@ $contact = isset($_POST['contact']) ? $_POST['contact'] : '';
 
 
 // Function to validate login credentials
-function ValidateLogin($email, $password) {
+function ValidateLogin($name,$email, $password) {
     $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME); 
     $email = mysqli_real_escape_string($conn, $email); // Escape input for security
     $password = mysqli_real_escape_string($conn, $password);
-    $sql = "SELECT * FROM user WHERE email = '$email' && password = '$password'";
+    $name = mysqli_real_escape_string($conn, $name);
+
+    $sql = "SELECT * FROM user WHERE email = '$email' && password = '$password' && name = '$name'";
     echo "SQL Query: $sql<br>"; // Debugging output
     $result = $conn->query($sql);
     $row = mysqli_fetch_assoc($result);
@@ -21,9 +23,8 @@ function ValidateLogin($email, $password) {
 }
 
 // Function to register a new user
-function Register($email, $password, $name, $last_name, $contact) {
- 
-
+function Register($email, $name, $last_name, $contact, $password) {
+    // Database connection setup
     $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     if (!$conn) {
         die("Connection failed: " . mysqli_connect_error());
@@ -31,22 +32,19 @@ function Register($email, $password, $name, $last_name, $contact) {
 
     // Escape input for security
     $email = mysqli_real_escape_string($conn, $email);
-    $password = mysqli_real_escape_string($conn, $password);
     $name = mysqli_real_escape_string($conn, $name);
     $last_name = mysqli_real_escape_string($conn, $last_name);
     $contact = mysqli_real_escape_string($conn, $contact);
+    $password = mysqli_real_escape_string($conn, $password);
 
     // Insert user data into database
     $insert = "INSERT INTO user (name, last_name, contact, email, password, type) VALUES ('$name', '$last_name', '$contact', '$email', '$password', 'user')";
     if (mysqli_query($conn, $insert)) {
-        $report = 'Registered Complete!';
-        header("location: ../users/users.php");
+        mysqli_close($conn);
+        return true; // Registration successful
     } else {
-        $report = 'Error: ' . $insert . '<br>' . mysqli_error($conn);
+        mysqli_close($conn);
+        return false; // Registration failed
     }
-
-    // Close connection
-    mysqli_close($conn);
-    return $report;
 }
 ?>

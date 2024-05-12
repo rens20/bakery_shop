@@ -7,10 +7,12 @@ session_start();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
+    $name = $_POST['name'];
+
     $password = $_POST['password'];
 
     // Validate login credentials
-    $user = ValidateLogin($email, $password);
+    $user = ValidateLogin($name,$email, $password);
 
     if (empty($user)) {
         echo '<script>alert("Login failed!");</script>';
@@ -23,7 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 exit();
             case 'user':
                 $_SESSION['token'] = 'user';
-                header("Location: ./users/users.php");
+                $_SESSION['username'] = $name; 
+   header("Location: ./users/users.php?name=" . urlencode($name));
+
+               
                 exit();
             default:
                 echo "Invalid user type";
@@ -66,6 +71,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h2 class="text-2xl font-bold mb-4">Login Form</h2>
         <form action="" method="post">
+
+         <div class="mb-4">
+                <label for="name" class="block text-sm font-medium text-gray-700">name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your name"
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
             <div class="mb-4">
                 <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                 <input type="text" id="email" name="email" placeholder="Enter your email"

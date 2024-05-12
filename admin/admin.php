@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         // Upload the file to the server
-        $upload_dir = 'uploads/';
+        $upload_dir = '../uploads/';
         $image_path = $upload_dir . $image_name;
         if (move_uploaded_file($image_tmp, $image_path)) {
             // File uploaded successfully, now insert product data into database
