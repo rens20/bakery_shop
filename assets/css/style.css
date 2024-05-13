@@ -1,339 +1,242 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-	font-family: 'Poppins', sans-serif;
+body {
+  background: snow;
+  height: 100vh;
+  display: grid;
+  place-content: center;
+  box-sizing: border-box;
+  font-family: "IBM Plex Sans", sans-serif;
 }
 
-:root {
-	--grey: #F4F2FF;
-	--dark-grey: #B7B7B7;
-
-	--green: #23AE00;
-	--light-green: #BDFFAC;
-
-	--red: #FE2727;
-	--light-red: #FFD2D2;
-
-	--blue: #277FFE;
-	--light-blue: #B6C6FF;
-	--dark-blue: #1368E3;
-
-	--bs: #AECFFF;
-	--text: #9B9B9B;
-}
-
-a {
-	color: var(--blue);
-	transition: all .3s ease;
-	text-decoration: none;
-}
-
-a:hover {
-	color: var(--dark-blue);
-}
-
-  .custom-shape-divider-top-1714543952 {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    overflow: hidden;
-    line-height: 0;
-    transform: rotate(180deg);
-	z-index: -1;
-}
-
-.custom-shape-divider-top-1714543952 svg {
+.credit-card-input {
+  --cc-type: "Credit Card";
+  --cc-color: linear-gradient(
+    45deg,
+    hsl(0deg 0% 44%) 0%,
+    hsl(344deg 0% 49%) 11%,
+    hsl(344deg 0% 54%) 22%,
+    hsl(344deg 0% 59%) 33%,
+    hsl(344deg 0% 65%) 44%,
+    hsl(344deg 0% 70%) 56%,
+    hsl(344deg 0% 75%) 67%,
+    hsl(344deg 0% 81%) 78%,
+    hsl(344deg 0% 87%) 89%,
+    hsl(0deg 0% 93%) 100%
+  );
+  margin-inline: auto;
+  display: grid;
+  place-content: center;
+  .card {
+    margin-inline: auto;
+    aspect-ratio: 16/9;
+    height: 250px;
+    color: white;
+    text-shadow: -1px 2px 3px transparentize(#333, 0.15);
+    border-radius: 1rem;
+    background-image: var(--cc-color);
+    margin-block-end: 1.5rem;
     position: relative;
-    display: block;
-    width: calc(175% + 1.3px);
-    height: 315px;
+    transition: 0.5s ease;
+    transform-style: preserve-3d;
+    box-shadow: 0px 0px 2.7px rgba(0, 0, 0, 0.022),
+      0px 0px 6.9px rgba(0, 0, 0, 0.031), 0px 0px 14.2px rgba(0, 0, 0, 0.039),
+      0px 0px 29.2px rgba(0, 0, 0, 0.048), 0px 0px 80px rgba(0, 0, 0, 0.07);
+
+    .face {
+      display: flex;
+      border-radius: 1rem;
+      backface-visibility: hidden;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+    .card-number {
+      position: absolute;
+      bottom: 90px;
+      left: 20px;
+      font-size: 1.75rem;
+      font-family: "IBM Plex Mono", monospace;
+      font-variant-numeric: tabular-nums;
+      span:nth-child(4n) {
+        margin-inline-end: 1ch;
+      }
+    }
+    .card-holder {
+      position: absolute;
+      left: 20px;
+      bottom: 30px;
+      font-size: 1.25rem;
+      font-family: "IBM Plex Mono", monospace;
+      font-variant-numeric: tabular-nums;
+    }
+    .card-date {
+      position: absolute;
+      right: 20px;
+      bottom: 30px;
+      font-size: 1.25rem;
+      font-family: "IBM Plex Mono", monospace;
+      font-variant-numeric: tabular-nums;
+    }
+    .back {
+      background: var(--cc-color);
+      transform: rotateY(180deg);
+    }
+    .card-block {
+      position: absolute;
+      bottom: 80px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      height: 40px;
+      background: white;
+    }
+    .card-signature {
+      padding-inline: 1ch;
+      height: 100%;
+      width: 150px;
+      background: #f2fcff;
+      overflow: hidden;
+      svg {
+        fill: #000;
+        filter: blur(3px);
+      }
+    }
+    .card-cvv {
+      color: black;
+      text-shadow: none;
+      font-size: 1.25rem;
+      width: 3ch;
+      padding-inline: 1ch;
+      font-family: "IBM Plex Mono", monospace;
+      font-variant-numeric: tabular-nums;
+      font-style: oblique;
+    }
+    .mag-strip {
+      position: absolute;
+      top: 40px;
+      background: transparentize(#333, 0.5);
+      height: 40px;
+      width: 100%;
+    }
+    &:before {
+      content: var(--cc-type);
+      font-size: 1.25rem;
+      color: white;
+      text-shadow: none;
+      font-weight: bold;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+  }
+  form {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1rem;
+    .form-group {
+      display: flex;
+      flex-flow: column;
+    }
+    input {
+      font-size: 1.2rem;
+      padding: 1ch;
+      border: 1px solid #333;
+      border-radius: 0.25rem;
+    }
+  }
+  .example {
+    margin-block: 2rem;
+  }
+  dl {
+    display: flex;
+    gap: 1rem;
+    dt {
+      font-weight: bold;
+    }
+    dd {
+      margin: 0;
+      font-family: "IBM Plex Mono", monospace;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+}
+
+// VISA
+.credit-card-input:has(input[name="cc"][value^="4"]) {
+  --cc-type: "VISA";
+  --cc-color: linear-gradient(
+    45deg,
+    hsl(234deg 58% 23%) 0%,
+    hsl(234deg 57% 26%) 11%,
+    hsl(234deg 56% 30%) 22%,
+    hsl(234deg 56% 34%) 33%,
+    hsl(234deg 55% 38%) 44%,
+    hsl(234deg 54% 43%) 56%,
+    hsl(234deg 54% 47%) 67%,
+    hsl(234deg 56% 51%) 78%,
+    hsl(234deg 67% 56%) 89%,
+    hsl(234deg 79% 60%) 100%
+  );
+}
+
+// MasterCard
+.credit-card-input:has(input[name="cc"][value^="5"]) {
+  --cc-type: "MasterCard";
+  --cc-color: linear-gradient(
+    45deg,
+    hsl(357deg 79% 48%) 0%,
+    hsl(359deg 71% 50%) 11%,
+    hsl(359deg 70% 53%) 22%,
+    hsl(359deg 69% 55%) 33%,
+    hsl(359deg 68% 56%) 44%,
+    hsl(359deg 67% 58%) 56%,
+    hsl(359deg 66% 59%) 67%,
+    hsl(358deg 64% 61%) 78%,
+    hsl(358deg 62% 62%) 89%,
+    hsl(357deg 60% 63%) 100%
+  );
+}
+
+// Discover
+.credit-card-input:has(input[name="cc"][value^="6"]) {
+  --cc-type: "Discover";
+  --cc-color: linear-gradient(
+    45deg,
+    hsl(19deg 76% 48%) 0%,
+    hsl(18deg 73% 51%) 11%,
+    hsl(18deg 75% 53%) 22%,
+    hsl(18deg 77% 55%) 33%,
+    hsl(18deg 79% 58%) 44%,
+    hsl(19deg 81% 60%) 56%,
+    hsl(19deg 83% 62%) 67%,
+    hsl(19deg 86% 64%) 78%,
+    hsl(19deg 89% 66%) 89%,
+    hsl(19deg 93% 69%) 100%
+  );
+}
+
+// American Express
+.credit-card-input:has(input[name="cc"][value^="34"]),
+.credit-card-input:has(input[name="cc"][value^="37"]) {
+  --cc-type: "American Express";
+  --cc-color: linear-gradient(
+    45deg,
+    hsl(212deg 75% 44%) 0%,
+    hsl(214deg 61% 49%) 11%,
+    hsl(215deg 59% 53%) 22%,
+    hsl(215deg 58% 57%) 33%,
+    hsl(215deg 58% 61%) 44%,
+    hsl(215deg 58% 64%) 56%,
+    hsl(214deg 57% 67%) 67%,
+    hsl(214deg 56% 71%) 78%,
+    hsl(213deg 55% 74%) 89%,
+    hsl(213deg 53% 77%) 100%
+  );
+}
+
+.credit-card-input:has(input[name="cvv"]:focus) {
+  .card {
     transform: rotateY(180deg);
-
-}
-
-.custom-shape-divider-top-1714543952 .shape-fill {
-    fill: green;
-	}
-
-/*bg animation kunno*/
-	.center {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.large-image{
-		position: absolute;
-		display: flex;
-		justify-content:end;
-		width: 100%;
-		height: auto;
-		z-index: -2;
-		img{
-			width: 700px;
-			height: 850px;
-		}
-	}
-
-	section{
-		width: 100%;
-		height: 100%;
-	}
-
-	section .set{
-		position: absolute;
-		width: 125vh;
-		height: 60%;
-		top: 0;
-		left: 0;
-		pointer-events: none;
-		z-index: -3;
-	}
-
-	.set{
-		img{
-			width: 275px;
-			height: 275px;
-		}
-	}
-
-	section .set .item{
-		position:absolute;
-		display: block;
-	}
-
-	section .set .item:nth-child(1){
-		left:20%;
-		top: 60%;
-		animation: animate 15s linear infinite;
-		animation-delay: -7s;
-	}
-
-	section .set .item:nth-child(2){
-		left:50%;
-		animation: animate 20s linear infinite;
-		animation-delay: -5s;
-	}
-
-	section .set .item:nth-child(3){
-		left:70%;
-		top: 60%;
-		animation: animate 20s linear infinite;
-		animation-delay: -0s;
-	}
-
-	section .set .item:nth-child(4){
-		left:10%;
-		animation: animate 15s linear infinite;
-		animation-delay: -5s;
-	}
-
-	section .set .item:nth-child(5){
-		left:85%;
-		animation: animate 18s linear infinite;
-		animation-delay: -10s;
-	}
-
-	@keyframes animate{
-		0%{
-			opacity: 0;
-			top: -10%;
-			transform: translateY(20px) rotate(0deg);
-		}
-		10%{
-			opacity: 1;
-		}
-		20%{
-			transform: translateY(-20px) rotate(45deg);
-		}
-		40%{
-			transform: translateY(-20px) rotate(90deg);
-		}
-		60%{
-			transform: translateY(20px) rotate(180deg);
-		}
-		80%{
-			transform: translateY(-20px) rotate(180deg);
-		}
-		100%{
-			top:110%;
-			transform: translateY(-20px) rotate(225deg);
-		}
-	}
-
-	.set2{
-		transform: scale(2) rotate(180deg);
-		filter: blur(1px);	
-		img{
-			width: 150px;
-			height: 150px;
-		}
-	}
-
-	.set3{
-		transform: scale(1) rotate(225deg);
-		filter: blur(2px);
-		img{
-			width: 150px;
-			height: 150px;
-		}
-	}
-/*end of bg animation kunno*/
-
-/*login and sign up*/
-.container {
-	max-width: 500px;
-	width: 100%;
-	position: relative;
-	display: flex;
-	min-height: 85vh;
-	padding: 0 16px;
-}
-form {
-	width: 100%;
-	padding: 28px;
-	border-radius: 12px;
-	background: #fff;
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%) scale(.8);
-	opacity: 0;
-	z-index: 100;
-	transition: all .3s ease;
-	transition-delay: 0s;
-	border: 1px solid lightgray;
-}
-form.active {
-	transform: translateY(-50%);
-	opacity: 1;
-	z-index: 200;
-	transition-delay: .3s;
-}
-.title {
-	font-size: 24px;
-	font-weight: 600;
-	margin-bottom: 20px;
-}
-.form-group {
-	margin-bottom: 14px;
-}
-.form-group label {
-	display: inline-block;
-	margin-bottom: 4px;
-}
-.input-group {
-	width: 100%;
-	position: relative;
-}
-.input-group input {
-	padding: 12px 40px 12px 20px;
-	outline: none;
-	border-radius: 6px;
-	border: 1px solid var(--dark-grey);
-	width: 100%;
-	transition: all .3s ease;
-}
-/*end of login and sign up*/
-
-/* Validation */
-.input-group input:focus,
-.input-group input:not(:placeholder-shown) {
-	border-color: var(--blue);
-	background: var(--grey);
-}
-.input-group input:focus + i,
-.input-group input:not(:placeholder-shown) + i {
-	color: var(--blue);
-}
-.input-group input:focus:valid {
-	box-shadow: 0 0 0 4px var(--light-green);
-}
-.input-group input:valid:not(:placeholder-shown) {
-	border-color: var(--green);
-}
-.input-group input:valid:not(:placeholder-shown) + i {
-	color: var(--green);
-}
-.input-group input:invalid:not(:placeholder-shown) {
-	border-color: var(--red);
-}
-.input-group input:invalid:not(:placeholder-shown) + i {
-	color: var(--red);
-}
-.input-group input:focus:invalid {
-	box-shadow: 0 0 0 4px var(--light-red);
-}
-.input-group input:focus,
-.input-group input:focus:placeholder-shown {
-	box-shadow: 0 0 0 4px var(--bs);
-}
-/* Validation */
-
-/*login and sign up*/
-.input-group i {
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
-	right: 20px;
-	color: var(--text);
-	pointer-events: none;
-	transition: all .3s ease;
-}
-.form-group .help-text {
-	font-size: 12px;
-	color: var(--text);
-}
-.btn-submit {
-	padding: 12px 0;
-	display: block;
-	width: 100%;
-	color: #fff;
-	border-radius: 6px;
-	cursor: pointer;
-	transition: all .3s ease;
-	border: none;
-	font-weight: 500;
-	background: var(--blue);
-	margin-bottom: 20px;
-}
-
-.horizontal-name{
-	display: flex;
-	flex-wrap: nowrap;
-	justify-content: space-evenly;
-	.form-group{
-		padding: 3px;
-	}
-}
-
-.btn-submit:hover {
-	background: var(--dark-blue);
-}
-/*end of login and sign up*/
-
-.custom-shape-divider-bottom-1714545726 {
-	position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    overflow: hidden;
-    line-height: 0;
-    transform: rotate(180deg);
-	z-index: -1;
-}
-
-.custom-shape-divider-bottom-1714545726 svg {
-    position: relative;
-    display: block;
-    width: calc(200% + 1.3px);
-    height: 450px;
-}
-
-.custom-shape-divider-bottom-1714545726 .shape-fill {
-    fill: green;
+  }
 }

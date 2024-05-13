@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($isValid === true) { 
         $_SESSION['username'] = $name; 
-   header("Location: ./users/users.php?name=" . urlencode($name));
+   header("Location: ./users/product.php?name=" . urlencode($name));
 
         exit;
     } else {

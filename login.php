@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             case 'user':
                 $_SESSION['token'] = 'user';
                 $_SESSION['username'] = $name; 
-   header("Location: ./users/users.php?name=" . urlencode($name));
+   header("Location: ./users/product.php?name=" . urlencode($name));
 
                
                 exit();
