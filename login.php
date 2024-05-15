@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         switch ($user['type']) {
             case 'admin':
                 $_SESSION['token'] = 'admin';
-                header("Location: ./admin/admin.php");
+                header("Location: ./admin/home.php");
                 exit();
             case 'user':
                 $_SESSION['token'] = 'user';

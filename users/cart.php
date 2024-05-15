@@ -1,48 +1,29 @@
 <?php
 session_start();
 
-// Get the username from the URL parameter
+// Include database configuration
+require_once '../config/configuration.php';
+
+// Fetch cart items from the database
+$conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+if (!$conn) {
+    die('Database connection error: ' . mysqli_connect_error());
+}
+
 $username = isset($_GET['name']) ? $_GET['name'] : '';
 
-// Initialize cart for the current user if not yet initialized
-if (!isset($_SESSION[$username.'_cart'])) {
-    $_SESSION[$username.'_cart'] = [];
-}
+$sql = "SELECT * FROM user_cart WHERE username = ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "s", $username);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 
-// Add to Cart functionality
-if (isset($_POST['add_to_cart'])) {
-    $product_id = isset($_POST['product_id']) ? $_POST['product_id'] : '';
-    $product_name = isset($_POST['product_name']) ? $_POST['product_name'] : '';
-    $product_price = isset($_POST['product_price']) ? $_POST['product_price'] : '';
-
-    if ($product_id && $product_name && $product_price) {
-        // Add product to the cart for the current user
-        $_SESSION[$username.'_cart'][] = [
-            'id' => $product_id,
-            'name' => $product_name,
-            'price' => $product_price
-        ];
-        echo '<p>Product added to your cart.</p>';
-    } else {
-        echo '<p>Error: Product details are incomplete.</p>';
-    }
-}
-
-
-// Delete from Cart functionality
-if (isset($_POST['delete_item'])) {
-    $deleteIndex = isset($_POST['delete_index']) ? $_POST['delete_index'] : '';
-
-    if ($deleteIndex !== '' && isset($_SESSION[$username.'_cart'][$deleteIndex])) {
-        // Remove the item from the cart
-        unset($_SESSION[$username.'_cart'][$deleteIndex]);
-        // Reset array keys to maintain continuous indexing
-        $_SESSION[$username.'_cart'] = array_values($_SESSION[$username.'_cart']);
-        // Store the deleted product in 'deleted_products.php'
-        $deletedProductsFile = fopen("process.php", "a");
-        fwrite($deletedProductsFile, json_encode($deletedProduct) . PHP_EOL);
-        fclose($deletedProductsFile);
-    }
+// Calculate total price
+$total_price = 0;
+$cart_items = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $cart_items[] = $row;
+    $total_price += $row['product_price'];
 }
 ?>
 <!DOCTYPE html>
@@ -53,89 +34,137 @@ if (isset($_POST['delete_item'])) {
     <title>Your Cart</title>
     <!-- Include Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <!-- Include Sweet Alert -->
+    <!-- Include SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto p-4">
-        <h1 class="text-3xl font-semibold mb-4">Your Cart</h1>
-        <?php if (!empty($_SESSION[$username.'_cart']) && is_array($_SESSION[$username.'_cart'])) : ?>
-            <div class="bg-white rounded-lg shadow-md p-4">
-                <h2 class="text-xl font-bold mb-4">Cart Items</h2>
-                <ul>
-                    <?php foreach ($_SESSION[$username.'_cart'] as $index => $item) : ?>
-                        <li class="flex justify-between items-center py-2 border-b">
-                            <span><?= $item['name'] ?></span>
-                            <span>$<?= $item['price'] ?></span>
-                            <form method="post" action="">
-                                <input type="hidden" name="delete_index" value="<?= $index ?>">
-                                <button type="submit" name="delete_item" class="text-red-500 ml-2">Delete</button>
-                            </form>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
+<body>
+     <div class="container mx-auto px-4 py-8">
+        <header class="flex justify-between items-center mb-6">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <img src="../assets/image/logo.png" alt="Logo" class="h-10 mr-4">
+                <h1 class="text-2xl mb-4">Welcome, <?php echo isset($_GET['name']) ? htmlspecialchars($_GET['name']) : 'Guest'; ?></h1>
             </div>
-            <div class="bg-white rounded-lg shadow-md p-4 mt-4">
-                <h2 class="text-xl font-bold mb-4">Total Price</h2>
-                <?php
-                $totalPrice = 0;
-                foreach ($_SESSION[$username.'_cart'] as $item) {
-                    $totalPrice += $item['price'];
-                }
-                ?>
-                <p class="text-lg font-semibold">Total: $<?= number_format($totalPrice, 2) ?></p>
+            <!-- Navigation Links -->
+            <nav>
+                <ul class="flex">
+                    <li class="mr-6 font-bold"><a href="product.php?name=<?= $username ?>">Products</a></li>
+                    <li class="mr-6 font-bold"><a href="cart.php?name=<?= $username ?>">Cart</a></li>
+                    <li class="mr-6 font-bold"><a href="users_receive.php?name=<?=$username ?>">Receive</a></li>
+                </ul>
+            </nav>
+        </header>
+        <hr>
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-4">Your Cart</h1>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+                <thead class="bg-gray-800 text-white">
+                    <tr>
+                        <th class="w-1/3 px-4 py-2">Product Name</th>
+                        <th class="w-1/3 px-4 py-2">Price</th>
+                        <th class="w-1/3 px-4 py-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (count($cart_items) > 0) : ?>
+                        <?php foreach ($cart_items as $item) : ?>
+                            <tr class="text-gray-700">
+                                <td class="border px-4 py-2"><?= htmlspecialchars($item['product_name']) ?></td>
+                                <td class="border px-4 py-2"><?= htmlspecialchars($item['product_price']) ?></td>
+                                <td class="border px-4 py-2">
+                                    <!-- Remove from Cart form -->
+                                    <form action="remove_from_cart.php?name=<?= urlencode($username) ?>" method="post">
+                                        <input type="hidden" name="cart_id" value="<?= $item['id'] ?>">
+                                        <button type="submit" name="remove_from_cart" class="bg-red-600 text-white font-bold py-2 px-4 rounded">Remove</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else : ?>
+                        <tr>
+                            <td colspan="3" class="text-center text-gray-500 py-4">Your cart is empty.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+                <tfoot class="bg-gray-100">
+                    <tr>
+                        <td colspan="2" class="text-right font-bold px-4 py-2">Total Price:</td>
+                        <td class="font-bold px-4 py-2"><?= number_format($total_price, 2) ?></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
 
-                <!-- Credit Card Payment Form -->
-                <div class="w-96 mx-auto border border-gray-400 rounded-lg">
-                    <div class="w-full h-auto p-4 flex items-center border-b border-gray-400">
-                        <h1 class="w-full">Credit Card</h1>
-                    </div>
-                    <div class="w-full h-auto p-4">
-                        <form action="payment.php?name=<?= $username ?>" method="post">
-                            <div class="mb-4 px-3 py-1 bg-white rounded-sm border border-gray-300 focus-within:text-gray-900 focus-within:border-gray-500">
-                                <label for="cc-name" class="text-xs tracking-wide uppercase font-semibold">CARD NAME</label>
-                                <input id="cc-name" type="text" name="cc-name" class="w-full h-8 focus:outline-none" placeholder="CARD NAME">
-                            </div>
-                            <!-- Add other credit card fields here -->
-                            <button class="h-16 w-full rounded-sm bg-indigo-600 tracking-wide font-semibold text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-600">Pay Now</button>
-                        </form>
-                    </div>
+        <h2 class="text-2xl font-bold my-4">Payment Method</h2>
+        <form id="payment-form" action="payment_process.php?name=<?= urlencode($username) ?>" method="post">
+            <div class="mb-4">
+                <label for="payment_method" class="block text-gray-700 font-bold mb-2">Choose a payment method:</label>
+                <select id="payment_method" name="payment_method" class="block w-full p-2 border rounded">
+                    <option value="cod">Cash on Delivery</option>
+                    <option value="credit_card">Credit Card</option>
+                </select>
+            </div>
+
+            <div id="credit-card-info" class="hidden">
+                <div class="mb-4">
+                    <label for="card_name" class="block text-gray-700 font-bold mb-2">Name on Card:</label>
+                    <input type="text" id="card_name" name="card_name" class="block w-full p-2 border rounded">
+                </div>
+                <div class="mb-4">
+                    <label for="card_number" class="block text-gray-700 font-bold mb-2">Card Number:</label>
+                    <input type="text" id="card_number" name="card_number" class="block w-full p-2 border rounded">
                 </div>
             </div>
-        <?php else : ?>
-            <p>Your cart is empty.</p>
-        <?php endif; ?>
+
+            <button type="submit" class="bg-blue-600 text-white font-bold py-2 px-4 rounded">Pay Now</button>
+        </form>
     </div>
 
-    <!-- Sweet Alert Styles -->
-    <style>
-        .swal2-popup {
-            font-size: 1.6rem;
-        }
-    </style>
+  <script>
+    // Handle payment form submission
+    document.getElementById('payment-form').addEventListener('submit', function (e) {
+        e.preventDefault();
 
-    <!-- Sweet Alert Script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-        <?php if (isset($_SESSION['payment_success'])) : ?>
+        // Perform form validation here if needed
+
+        // Show payment success alert
+        Swal.fire({
+            title: 'Payment Successful!',
+            text: 'Thank you for your purchase.',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        }).then(() => {
+            // Redirect to payment_process.php to handle the payment and cart clearing
+            window.location.href = 'payment_process.php?name=<?= urlencode($username) ?>. '&payment=sucess');
+        });
+    });
+
+    // Check URL parameters for status messages
+    document.addEventListener('DOMContentLoaded', function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+        if (status === 'paid') {
             Swal.fire({
-                title: 'Payment Successful!',
-                text: 'Your payment was successful.',
+                title: 'Payment Completed!',
+                text: 'Your payment has been processed successfully.',
                 icon: 'success',
                 confirmButtonText: 'OK'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    setTimeout(() => {
-                        window.location.href = 'product.php?name=<?php echo $username; ?>';
-                    }, 1000); // Redirect after 4 seconds (4000 milliseconds)
-                }
+            }).then(() => {
+                // Redirect to cart.php after payment confirmation
+                window.location.href = 'cart.php?name=<?= urlencode($username) ?>';
             });
-            <?php
-            // Unset the session variable after displaying the alert
-            unset($_SESSION['payment_success']);
-            endif;
-            ?>
+        } else if (status === 'error') {
+            Swal.fire({
+                title: 'Error!',
+                text: 'There was an error processing your payment.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
     });
-    </script>
+    
+</script>
+
 </body>
 </html>
