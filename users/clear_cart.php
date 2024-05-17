@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Include database configuration
 require_once '../config/configuration.php';
 
 $username = isset($_GET['name']) ? $_GET['name'] : '';

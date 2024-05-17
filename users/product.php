@@ -25,12 +25,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
     $stmt = mysqli_prepare($conn, $insert_sql);
     mysqli_stmt_bind_param($stmt, "siss", $username, $product_id, $product_name, $product_price);
     if (mysqli_stmt_execute($stmt)) {
-        echo "<script>alert('Product added to cart');</script>";
+        // echo "<script>alert('Product added to cart');</script>";
     } else {
         echo "<script>alert('Error adding product to cart');</script>";
     }
     mysqli_stmt_close($stmt);
 }
+$count_sql = "SELECT COUNT(*) as count FROM user_cart WHERE username = ?";
+$count_stmt = mysqli_prepare($conn, $count_sql);
+mysqli_stmt_bind_param($count_stmt, "s", $username);
+mysqli_stmt_execute($count_stmt);
+$count_result = mysqli_stmt_get_result($count_stmt);
+$count_row = mysqli_fetch_assoc($count_result);
+$cart_count = $count_row['count'];
+mysqli_stmt_close($count_stmt);
 
 ?>
 <!DOCTYPE html>
@@ -41,22 +49,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
     <title>Product List</title>
     <!-- Include Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        li:hover {
+            color: #78350f;
+        }
+        button {
+            background: #78350f;
+            margin-left: 60px;
+        }
+        button:hover {
+            background: #451a03;
+        }
+        hr {
+            font-style: bold;
+        }
+    </style>
+    <script>
+        function toggleMenu() {
+            document.getElementById('nav-links').classList.toggle('hidden');
+        }
+    </script>
 </head>
-<style>
-    li:hover {
-        color: #78350f;
-    }
-    button {
-        background: #78350f;
-        margin-left: 60px;
-    }
-    button:hover {
-        background: #451a03;
-    }
-    hr {
-        font-style: bold;
-    }
-</style>
 <body>
     <div class="container mx-auto px-4 py-8">
         <header class="flex justify-between items-center mb-6">
@@ -65,12 +78,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
                 <img src="../assets/image/logo.png" alt="Logo" class="h-10 mr-4">
                 <h1 class="text-2xl mb-4">Welcome, <?php echo isset($_GET['name']) ? htmlspecialchars($_GET['name']) : 'Guest'; ?></h1>
             </div>
+            <!-- Hamburger Button -->
+            <div class="md:hidden">
+                <button onclick="toggleMenu()" class="focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
             <!-- Navigation Links -->
-            <nav>
-                <ul class="flex">
+            <nav id="nav-links" class="hidden md:flex">
+                <ul class="flex flex-col md:flex-row">
                     <li class="mr-6 font-bold"><a href="product.php?name=<?= $username ?>">Products</a></li>
-                    <li class="mr-6 font-bold"><a href="cart.php?name=<?= $username ?>">Cart</a></li>
-                    <li class="mr-6 font-bold"><a href="users_receive.php?name=<?$username ?>">Receive</a></li>
+                    <li class="mr-6 font-bold"><a href="cart.php?name=<?= $username ?>">Cart <?php echo ($cart_count > 0) ? '(' . $cart_count . ')' : ''; ?></a></li>
+                    <li class="mr-6 font-bold"><a href="lagout.php?name=<?= $username ?>">LagOut</a></li>
+                   <li class="mr-6 font-bold"><a href="about.php?name=<?= $username ?>">About Us</a></li>
                 </ul>
             </nav>
         </header>
