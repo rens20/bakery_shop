@@ -8,29 +8,34 @@ $contact = isset($_POST['contact']) ? $_POST['contact'] : '';
 
 
 // Function to validate login credentials
-function ValidateLogin($name,$email, $password) {
-    $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME); 
-    $email = mysqli_real_escape_string($conn, $email); // Escape input for security
-    $password = mysqli_real_escape_string($conn, $password);
-    $name = mysqli_real_escape_string($conn, $name);
+function ValidateLogin($name, $email, $password) {
+    $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
-    $sql = "SELECT * FROM user WHERE email = '$email' && password = '$password' && name = '$name'";
-    echo "SQL Query: $sql<br>"; // Debugging output
-    $result = $conn->query($sql);
-    $row = mysqli_fetch_assoc($result);
-    var_dump($row); // Debugging output
+    if (!$conn) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+
+    $sql = "SELECT * FROM user WHERE email = ? AND password = ? AND name = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sss", $email, $password, $name);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+
+    $stmt->close();
+    $conn->close();
+
     return $row;
 }
 
-// Function to register a new user
 function Register($email, $name, $last_name, $contact, $password) {
-    // Database connection setup
+
     $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     if (!$conn) {
         die("Connection failed: " . mysqli_connect_error());
     }
 
-    // Escape input for security
+
     $email = mysqli_real_escape_string($conn, $email);
     $name = mysqli_real_escape_string($conn, $name);
     $last_name = mysqli_real_escape_string($conn, $last_name);

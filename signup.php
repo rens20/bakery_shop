@@ -6,9 +6,7 @@ require_once __DIR__ . '../config/validation.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
-    $name = $_POST['name'];
-    $last_name = $_POST['last_name'];
-    $contact = $_POST['contact'];
+    $name = $_POST['username'];
     $password = $_POST['password'];
 
     // Validate input
